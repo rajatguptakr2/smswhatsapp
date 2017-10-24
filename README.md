@@ -1,4 +1,4 @@
-# HumGenieMsgGApi
+# HumGenie
 
 Humgenie is an organisation lead by Mr. Vishwas Verma.
 
