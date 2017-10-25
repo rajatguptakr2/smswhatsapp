@@ -3633,12 +3633,14 @@ class Admin extends CI_Controller
     $password = substr( str_shuffle( $chars ), 0, $length );
     return $password;
 }
-public function getmultipleMessage()
+public function getmultipleWhatsappMessage()
 {
-	$this->load->view('whatsAppTemplate');
+	$page_data['page_title']    = get_phrase('whatsapp Message');
+    $page_data['page_name']     = 'whatsAppTemplate';
+    $this->load->view('backend/index', $page_data);
 }
 
-public function postmultipleMessage()
+public function postmultipleWhatsappMessage()
 {
 	//echo 'wefgth';
 	$sent=array();
@@ -3667,7 +3669,10 @@ public function postmultipleMessage()
 					}
 	        }
 	}
-	$this->load->view('whatsAppTemplate', $not_sent, $sent);
+	$page_data['page_title']    = get_phrase('whatsapp Message');
+    $page_data['page_name']     = 'whatsAppTemplate';
+    $this->load->view('backend/index', $page_data, $not_sent, $sent);
+	// $this->load->view('whatsAppTemplate', $not_sent, $sent);
 }
 
 private function contact_gateway($number, $message)

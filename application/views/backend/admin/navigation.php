@@ -643,6 +643,12 @@
                 <span><?php echo get_phrase('message'); ?></span>
             </a>
         </li>
+        <li class="<?php if ($page_name == 'whatsappmessage') echo 'active'; ?> ">
+            <a href="<?php echo base_url(); ?>index.php?admin/getmultipleWhatsappMessage">
+                <i class="entypo-mail"></i>
+                <span><?php echo get_phrase('Whatsapp Message'); ?></span>
+            </a>
+        </li>
 
         <!-- SETTINGS -->
         <li class="<?php
