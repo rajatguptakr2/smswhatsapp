@@ -104,7 +104,7 @@ $autoload['helper'] = array('url','file','form','security','string','inflector',
 |
 */
 
-$autoload['config'] = array();
+$autoload['config'] = array('whatsmateKey');
 
 
 /*

@@ -8,6 +8,9 @@ class Admin extends CI_Controller
 		parent::__construct();
 		$this->load->database();
         $this->load->library('session');
+        /* form controls*/
+        $this->load->helper('form');
+        $this->load->helper('url');
 
        /*cache control*/
 		$this->output->set_header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
@@ -78,7 +81,6 @@ class Admin extends CI_Controller
 			$page_data['page_title'] = get_phrase('add_document_categories');
 			$this->load->view('backend/index', $page_data);
 		}
-
     }
 
 	function delete_mdoc($mdoc_id = '' ,$student_id=''){
@@ -3631,4 +3633,62 @@ class Admin extends CI_Controller
     $password = substr( str_shuffle( $chars ), 0, $length );
     return $password;
 }
+public function getmultipleMessage()
+{
+	$this->load->view('whatsAppTemplate');
+}
+
+public function postmultipleMessage()
+{
+	//echo 'wefgth';
+	$sent=array();
+	$not_sent=array();
+	if ($this->session->userdata('admin_login') != 1)
+             redirect(base_url(), 'refresh');
+    else
+    {
+    		$numbers= array();
+			$query = $this->db->get('student');		
+			foreach ($query->result() as $row)
+			{
+	        	$message= $this->input->post('message');
+				//$message = 'API TESTING';
+	        	 $number= $row->emergency_contact;
+	        	 $response = $this->contact_gateway($number, $message);
+	        	if (strpos($response, 'queued') !== false) {
+ 				   array_push($sent, $number);
+ 				   $this->session->set_flashdata('sent',$sent); 
+ 				   //array_push($sent, $number);
+				}
+				else {
+					//array_push($not_sent, $number);
+					array_push($not_sent, $number);
+					$this->session->set_flashdata('not_sent',$not_sent); 
+					}
+	        }
+	}
+	$this->load->view('whatsAppTemplate', $not_sent, $sent);
+}
+
+private function contact_gateway($number, $message)
+		{
+			$postData = array(
+			  'number' => $number,  // TODO: Specify the recipient's number here. NOT the gateway number  /// only those receipients can be added who are have registered themselves through the gateway number.
+			  'message' => $message,
+			);
+			$headers = array(
+			  'Content-Type: application/json',
+			  'X-WM-CLIENT-ID: '.$this->config->item('whatsClientId'),
+			  'X-WM-CLIENT-SECRET: '.$this->config->item('whatsClientSecret')
+			);
+			$url = 'http://api.whatsmate.net/v3/whatsapp/single/text/message/' . $this->config->item('whatsInstanceId');
+			$ch = curl_init($url);
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
+			$response = curl_exec($ch);
+			curl_close($ch);
+			return $response;
+		}
 }
