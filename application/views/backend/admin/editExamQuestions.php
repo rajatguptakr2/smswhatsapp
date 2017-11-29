@@ -347,6 +347,16 @@
 </div>
 <script src="https://cdn.ckeditor.com/4.7.3/standard/ckeditor.js"></script>
 <script>
+		
+		$(document).ready(function(){
+		$('[data-toggle="tooltip"]').tooltip();  
+		$('button.selectQues').on('click', function(){
+			var target = $(this).attr('rel');
+			console.log(target);   				
+				$("div#"+target).css("display", "block").siblings("div").css("display", "none");   				
+			}); 
+		});
+
 		CKEDITOR.replace( 'editor1' );
 		CKEDITOR.replace( 'editor2' );
 		CKEDITOR.replace( 'editor3' );
@@ -358,14 +368,7 @@
 		CKEDITOR.replace( 'editor9' );
 		CKEDITOR.replace( 'editor10' );
 		CKEDITOR.replace( 'editor11' );
-		$(document).ready(function(){
-    		$('[data-toggle="tooltip"]').tooltip();  
-    		$('button.selectQues').on('click', function(){
-    			var target = $(this).attr('rel');
-    			console.log(target);   				
-   				$("div#"+target).css("display", "block").siblings("div").css("display", "none");   				
-				}); 
-    		});
+	
 			function addDescQues()
     		{
     			console.log('wsfghfdefg');
@@ -454,8 +457,13 @@
     		function addMcqQues()
     		{
     			console.log('wsfghfdefg');
-    			var mycheck = ;
-    			var  = $('#mcq_exam_id').val();
+    			var mcqQuestion = CKEDITOR.instances.mcqQuestionTextbox.getData();
+    			var mcqOpt1 = CKEDITOR.instances.mcqOpt1Textbox.getData();
+    			var mcqOpt2 = CKEDITOR.instances.mcqOpt2Textbox.getData();
+    			var mcqOpt3 = CKEDITOR.instances.mcqOpt3Textbox.getData();
+    			var mcqOpt4 = CKEDITOR.instances.mcqOpt4Textbox.getData();
+    			var examId = $('#mcq_exam_id').val();
+    			var mcqAnswer = $('#mcqansweroption').val();
     			
     			if($('#mcqansweroption').val()=='Enter Choice')
     			{
