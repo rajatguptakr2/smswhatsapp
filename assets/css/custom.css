@@ -1,0 +1,12 @@
+/**
+ *
+ * Apply Here your Custom CSS
+ *
+*/
+
+.error{
+	    color: red;
+}
+.dataTables_wrapper a {   
+    color: #3c8dbc!important;
+}
