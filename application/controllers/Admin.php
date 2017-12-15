@@ -3645,8 +3645,9 @@ public function getmultipleWhatsappMessage()
 		$query = $this->db->get();
 
 		$this->db->select('*');
-		$this->db->from('groups_student');
-		$this->db->join('student', 'student.student_id = groups_student.student_id');
+		$this->db->from('groups_student a');
+		$this->db->join('student b', 'b.student_id = a.student_id');
+		$this->db->join('parent c', 'c.rel_stuid = b.student_id');
 		$query2 = $this->db->get();
 
 		$this->db->select('*');
@@ -3672,13 +3673,15 @@ public function postmultipleWhatsappMessage()
     {
     		$numbers= array();
 			$message= $this->input->post('message');
-			$query = $this->db->get('student');		
+			$this->db->from('student a');
+			$this->db->join('parent b', 'b.rel_stuid = a.student_id');	
+			$query = $this->db->get();
 			foreach ($query->result() as $row)
 			{
-	        	 $number= $row->emergency_contact;
+	        	 $number= $row->mobile_no;
 	        	 $student_id = $row->student_id;
 	        	
-	        	 $response = $this->contact_gateway($student_id, $number, $message);
+	        	$response = $this->contact_gateway($student_id, $number, $message);
 	        	if (strpos($response, 'queued') !== false) 
 	        	{
  				   array_push($sent, $number);
@@ -3709,13 +3712,14 @@ public function postmultipleGroupWhatsappMessage()
 				$numbers= array();
 				$message= $this->input->post('groupMessage');			 	
 	    		$this->db->select('*');
-				$this->db->from('groups_student');
-				$this->db->join('student', 'student.student_id = groups_student.student_id');
-				$this->db->where('groups_student.group_id', $obj);				
+				$this->db->from('groups_student a');
+				$this->db->join('student b', 'b.student_id = a.student_id');
+				$this->db->join('parent c', 'c.rel_stuid = b.student_id');
+				$this->db->where('a.group_id', $obj);				
 				$query = $this->db->get();
 				foreach ($query->result() as $row)
 				{
-		        	$number= $row->emergency_contact;
+		        	$number= $row->mobile_no;
 		        	$student_id = $row->student_id;
 		        	echo $student_id;
 		        	echo $number;
@@ -3782,6 +3786,7 @@ public function getgrouping()
 		{
 			$this->db->select('*');
 			$this->db->from('student');
+			
 			$query = $this->db->get();
 			$page_data['page_title']    = get_phrase('Create Groups');
 		    $page_data['page_name']     = 'grouping';
@@ -3828,7 +3833,8 @@ public function postgrouping()
 					}
 
 				$this->db->select('*');
-				$this->db->from('student');
+				$this->db->from('student a');
+				$this->db->join('parent b', 'b.rel_stuid = a.student_id');
 				$query = $this->db->get();
 				$page_data['page_title']    = get_phrase('Create Groups');
 			    $page_data['page_name']     = 'grouping';
@@ -3970,7 +3976,6 @@ public function examinationEdit($exam_id){
              redirect(base_url(), 'refresh');
 	else
 	{
-		
 		$this->db->select('*');
 		$this->db->from('exam');
 		$this->db->where('exam_id', $exam_id);
@@ -3993,9 +3998,9 @@ public function examinationEdit($exam_id){
 
 	    $this->db->select('*');
 	    $this->db->from('exam h'); 
-	    $this->db->join('questions i', 'i.exam_id=h.exam_id', 'right');
-	    $this->db->join('more_than_one_mcq j', 'j.question_id=i.id', 'right');
-	    //$this->db->join('more_than_one_mcq_answers k', 'j.id=k.mto_mcq_id', 'right');
+	    $this->db->join('questions i', 'i.exam_id=h.exam_id','right');
+	    $this->db->join('more_than_one_mcq j', 'j.question_id=i.id','right');
+	    $this->db->join('more_than_one_mcq_answers k', 'j.id=k.mto_mcq_id','right');
 	    $this->db->where('i.exam_id',$exam_id);
 	    $query4 = $this->db->get();
 
@@ -4009,9 +4014,14 @@ public function examinationEdit($exam_id){
    
         foreach ($query4->result() as $rowmtomcq)
 			{
-			    $rowmtomcq->options =  $this->db->select('value')->from('more_than_one_mcq_options')->where('mto_mcq_id', $rowmtomcq->mto_mcq_id)->get()->result();
-			    // $rowmtomcq->correct_options_id =  $this->db->select('correct_options_id')->from('more_than_one_mcq_answers')->where('mto_mcq_id', $rowmtomcq->mto_mcq_id)->get()->result();
-			    $rowmtomcq->correct_options= $this->db->select('value')->from('more_than_one_mcq_options')->where('id', $rowmtomcq->correct_options_id)->get()->result();
+			    $rowmtomcq->optionss =  $this->db->select('value')->from('more_than_one_mcq_options')->where('mto_mcq_id', $rowmtomcq->mto_mcq_id)->get()->result();
+			    $rowmtomcq->correct_options_id =  $this->db->select('correct_options_id')->from('more_than_one_mcq_answers')->where('mto_mcq_id', $rowmtomcq->mto_mcq_id)->get()->result();
+			    $arr = array();
+			    foreach ($rowmtomcq->correct_options_id as $key) 
+			    {
+			    		array_push($arr, $key->correct_options_id);
+			    }
+			    $rowmtomcq->correct_options	= $this->db->select('value')->from('more_than_one_mcq_options')->where_in( 'id', $arr)->get()->result();
 			}
     	 
     	$page_data['query']     	=  $query;
@@ -4128,7 +4138,8 @@ public function addMtoMcqQues()
 		$mtoMcqOpt3 =  $this->input->post('mtoMcqOpt3');
 		$mtoMcqOpt4 =  $this->input->post('mtoMcqOpt4');
 		$mtoMcqAnswer =  $this->input->post('mtoMcqAnswer');
-				           
+		$question_id= '';
+
 		$insertIntoQuestions = array(
         		'exam_id' => $exam_id
 			);
@@ -4141,7 +4152,8 @@ public function addMtoMcqQues()
 					);
 		$this->db->insert('more_than_one_mcq', $mtoMcqQuestionInsert);
 		$mto_mcq_id = $this->db->insert_id();
-
+		//$mtoMcqAnswerArray = array();
+			
 		for($i=1; $i <=4 ; $i++) 
 		{	
 			if($i==1)
@@ -4171,27 +4183,359 @@ public function addMtoMcqQues()
 			}
 			
 			$this->db->insert('more_than_one_mcq_options', $mtoMcqOptInsert);
+			$mto_mcq_opt_id = $this->db->insert_id();
 			
-			$mtoMcqAnswerArray = array();
-			foreach ($mtoMcqAnswer as $key => $value) 
+			
+			foreach ($mtoMcqAnswer as $key) 
 			{
-				if($value == $i)
+				if($key == $i)
 				{
-					array_push($mtoMcqAnswerArray, $this->db->insert_id());
+					$mtoMcqAnswerInsert = array(
+					 	'mto_mcq_id' => $mto_mcq_id,
+					 	'correct_options_id' => $mto_mcq_opt_id,
+					);
+					var_dump($mtoMcqAnswerInsert);
+					$this->db->insert('more_than_one_mcq_answers', $mtoMcqAnswerInsert);
 				}
 			}
-    			
-        	
+		}
+	}
+}
+public function deleteQuestion($deleteId)
+{
+	$deleteId = $this->input->post('deleteId');
+	echo $deleteId.'hi';
+	// $this ->db-> where('id', $deleteId);
+ //  	$this ->db-> delete('questions');
+}
+public function mcqQuestionEdit($question_id)
+{
+	if ($this->session->userdata('admin_login') != 1)
+             redirect(base_url(), 'refresh');
+	else
+	{
+		$exam_id = '';
+		$this->db->select('exam_id');
+		$this->db->from('questions');
+		$this->db->where('id', $question_id);
+		$query = $this->db->get();
+		foreach ($query->result() as $row) 
+	    {
+	    	$exam_id =  $row->exam_id;
+	    }
+		$page_data['question_id']     	=  $question_id;
+		$page_data['page_title']    = get_phrase('Update Exam Questions');
+	    $page_data['page_name']     = 'updateExamMcqQuestion';
+	    $page_data['exam_id']     = $exam_id;
+	    $this->load->view('backend/index', $page_data);
+	}
+}
+public function mtoMcqQuestionEdit($question_id)
+{
+	if ($this->session->userdata('admin_login') != 1)
+             redirect(base_url(), 'refresh');
+	else
+	{
+		
+		$exam_id = '';
+		$this->db->select('exam_id');
+		$this->db->from('questions');
+		$this->db->where('id', $question_id);
+		$query = $this->db->get();
+		foreach ($query->result() as $row) 
+	    {
+	    	$exam_id =  $row->exam_id;
+	    }
+		$page_data['question_id']     	=  $question_id;
+		$page_data['page_title']    = get_phrase('Update Exam Questions');
+	    $page_data['page_name']     = 'updateExamMtoMcqQuestion';
+	    $page_data['exam_id']     = $exam_id;
+	    $this->load->view('backend/index', $page_data);
+	}
+}
+public function descQuestionEdit($question_id)
+{
+	
+	if ($this->session->userdata('admin_login') != 1)
+             redirect(base_url(), 'refresh');
+	else
+	{
+		$exam_id = '';
+		$this->db->select('exam_id');
+		$this->db->from('questions');
+		$this->db->where('id', $question_id);
+		$query = $this->db->get();
+		foreach ($query->result() as $row) 
+	    {
+	    	$exam_id =  $row->exam_id;
+	    }
+		$page_data['question_id']     	=  $question_id;		
+		$page_data['page_title']    = get_phrase('Update Exam Questions');
+	    $page_data['page_name']     = 'updateExamDescQuestion';
+	    $page_data['exam_id']     = $exam_id;
+	    $this->load->view('backend/index', $page_data);
+	}
+}
+public function fillMcqQuestion()
+{
+	if ($this->session->userdata('admin_login') != 1)
+             redirect(base_url(), 'refresh');
+	else
+	{
+		$question_id = $this->input->post('question_id');
+		
+		$mcq_id = '';
+		$correct = '';
+		$mcqQuestion = '';
+		$mcqOptions = array();
+		$this->db->select('*');
+		$this->db->from('mcq');
+		$this->db->where('question_id', $question_id);
+		$query = $this->db->get();
+		foreach ($query->result() as $row) 
+	    {
+	    	$mcq_id = $row->id;
+	    	$mcqQuestion = $row->mcq;
+	    }
+
+		$this->db->select('*');
+		$this->db->from('mcq_answers');
+		$this->db->where('mcq_id', $mcq_id);
+		$query3 = $this->db->get();
+
+		$this->db->select('*');
+		$this->db->from('mcq_options');
+		$this->db->where('mcq_id', $mcq_id);
+		$this->db->order_by('id', 'asc');	
+		$query2 = $this->db->get();
+
+		foreach ($query2->result() as $key=>$value) 
+	    {
+	    	array_push($mcqOptions, $value->value);
+	    	foreach ($query3->result() as $row3) 
+	    	{
+	    		if($row3->correct_options_id==$value->id)
+	    		{
+	    			$correct = $key;
+	    		}
+	    	}	
+	    }
+	    echo json_encode(array("question" => $mcqQuestion, "options" => $mcqOptions, 'mcq_id'=> $mcq_id, 'question_id'=>$question_id, 'correct' => $correct));			
+	}
+}
+public function fillMtoMcqQuestion()
+{
+	if ($this->session->userdata('admin_login') != 1)
+             redirect(base_url(), 'refresh');
+	else
+	{
+		$question_id = $this->input->post('question_id');
+		
+		$correct = array();
+		$mto_mcq_id = '';
+		$mtoMcqQuestion = '';
+		$mtoMcqOptions = array();
+		$this->db->select('*');
+		$this->db->from('more_than_one_mcq');
+		$this->db->where('question_id', $question_id);
+		$query = $this->db->get();
+		foreach ($query->result() as $row) 
+	    {
+	    	$mto_mcq_id = $row->id;
+	    	$mtoMcqQuestion = $row->mto_mcq;
+	    }
+
+	    $this->db->select('*');
+		$this->db->from('more_than_one_mcq_answers');
+		$this->db->where('mto_mcq_id', $mto_mcq_id);
+		$query3 = $this->db->get();
+
+		$this->db->select('*');
+		$this->db->from('more_than_one_mcq_options');
+		$this->db->where('mto_mcq_id', $mto_mcq_id);
+		$query2 = $this->db->get();
+		foreach ($query2->result() as $key=>$value) 
+	    {
+	    	array_push($mtoMcqOptions, $value->value);
+	    	foreach ($query3->result() as $row3) 
+	    	{
+	    		if($row3->correct_options_id==$value->id)
+	    		{
+	    			array_push($correct, $key);
+	    		}
+	    	}	
+	    }
+	    echo json_encode(array("question" => $mtoMcqQuestion, "options" => $mtoMcqOptions, 'mcq_id'=> $mto_mcq_id, 'question_id'=>$question_id, 'correct'=>$correct));	
+	}
+}
+public function fillDescQuestion()
+{
+	if ($this->session->userdata('admin_login') != 1)
+             redirect(base_url(), 'refresh');
+	else
+	{
+		$question_id = $this->input->post('question_id');
+		$this->db->select('descriptive');
+		$this->db->from('descriptive');
+		$this->db->where('question_id', $question_id);
+		$query = $this->db->get();
+		//	echo $question_id;
+		foreach ($query->result() as $row) 
+	    {
+	    	echo $row->descriptive;
+	    }	
+	}
+}
+public function updateMcqQuestion()
+{
+	$question_id = $this->input->post('question_id');
+	$mcqQuestion = $this->input->post('mcqQuestion');
+	$mcqAnswer =  $this->input->post('mcqAnswer');
+
+	echo $mcqAnswer;
+
+	$mcqOpt1 = $this->input->post('mcqOpt1');
+	$mcqOpt2 = $this->input->post('mcqOpt2');
+	$mcqOpt3 = $this->input->post('mcqOpt3');
+	$mcqOpt4 = $this->input->post('mcqOpt4');
+	$exam_id = $this->input->post('exam_id');
+	$this->db->select('*');
+	$this->db->from('mcq');
+	$this->db->where('question_id', $question_id);
+	$query = $this->db->get();
+	foreach ($query->result() as $row) 
+    {
+    	$mcq_id = $row->id;
+    }
+
+    $this->db->select('id');
+	$this->db->from('mcq_options');
+	$this->db->where('mcq_id', $mcq_id);
+	$this->db->order_by('id', 'asc');
+	$query2 = $this->db->get();
+	foreach ($query2->result() as $key=>$value) 
+    {
+    	
+    	if($key == '0')
+    	{
+    		$this->db->where('id', $value->id);
+    		$this->db->update('mcq_options', array('value' => $mcqOpt1));		
+    	}
+    	else if($key == '1')
+    	{
+    		$this->db->where('id', $value->id);
+    		$this->db->update('mcq_options', array('value' => $mcqOpt2));		
+    	}
+    	else if($key == '2')
+    	{
+    		$this->db->where('id', $value->id);
+    		$this->db->update('mcq_options', array('value' => $mcqOpt3));		
+    	}
+    	else if($key == '3')
+    	{
+    		$this->db->where('id', $value->id);
+    		$this->db->update('mcq_options', array('value' => $mcqOpt4));		
+    	} 
+    	if(($key+1) == $mcqAnswer)
+    	{
+    		$this->db->where('mcq_id', $mcq_id);
+   			$this->db->update('mcq_answers', array('correct_options_id' => $value->id));   
+    	}   	
+    }	    
+	$this->db->where('question_id', $question_id);
+    $this->db->update('mcq', array('mcq' => $mcqQuestion));
+	// echo $exam_id;
+}
+public function updateMtoMcqQuestion()
+{
+	$question_id = $this->input->post('question_id');
+	$mtoMcqQuestion = $this->input->post('mtoMcqQuestion');
+	$mtoMcqOpt1 = $this->input->post('mtoMcqOpt1');
+	$mtoMcqOpt2 = $this->input->post('mtoMcqOpt2');
+	$mtoMcqOpt3 = $this->input->post('mtoMcqOpt3');
+	$mtoMcqOpt4 = $this->input->post('mtoMcqOpt4');
+	$exam_id = $this->input->post('exam_id');
+	$mtoMcqAnswer =  $this->input->post('mtoMcqAnswer');
+	$mto_mcq_id = '';
+
+	
+	$this->db->select('*');
+	$this->db->from('more_than_one_mcq');
+	$this->db->where('question_id', $question_id);
+	$query = $this->db->get();
+	foreach ($query->result() as $row) 
+    {
+    	$mto_mcq_id = $row->id;
+    }
+
+    $this->db->select('id');
+	$this->db->from('more_than_one_mcq_options');
+	$this->db->where('mto_mcq_id', $mto_mcq_id);
+	$this->db->order_by('id', 'asc');
+	$query2 = $this->db->get();
+	foreach ($query2->result() as $key=>$value) 
+    {
+    	
+    	if($key == '0')
+    	{
+    		$this->db->where('id', $value->id);
+    		$this->db->update('more_than_one_mcq_options', array('value' => $mtoMcqOpt1));		
+    	}
+    	else if($key == '1')
+    	{
+    		$this->db->where('id', $value->id);
+    		$this->db->update('more_than_one_mcq_options', array('value' => $mtoMcqOpt2));		
+    	}
+    	else if($key == '2')
+    	{
+    		$this->db->where('id', $value->id);
+    		$this->db->update('more_than_one_mcq_options', array('value' => $mtoMcqOpt3));		
+    	}
+    	else if($key == '3')
+    	{
+    		$this->db->where('id', $value->id);
+    		$this->db->update('more_than_one_mcq_options', array('value' => $mtoMcqOpt4));		
+    	}
+    	
+    }
+
+
+
+    //update answer
+    $this->db->where('mto_mcq_id', $mto_mcq_id);
+  	$this->db->delete('more_than_one_mcq_answers');
+  	$arr = array();	
+	foreach ($mtoMcqAnswer as $thisAnswer) 
+	{
+		foreach ($query2->result() as $key => $value) 
+		{
+			
+			if(($key+1) == $thisAnswer)
+			{
+				$mtoMcqAnswerInsert = array(
+				 	'mto_mcq_id' => $mto_mcq_id,
+				 	'correct_options_id' => $value->id,
+				);
+
+				$this->db->insert('more_than_one_mcq_answers', $mtoMcqAnswerInsert);
+			}	
 		}
 
-		foreach ($mtoMcqAnswerArray as $key) 
-		{
-			$mtoMcqAnswerInsert = array(
-					 	'mto_mcq_id' => $question_id,
-					 	'correct_options_id' => $key
-					);
-			$this->db->insert('more_than_one_mcq_answers', $mtoMcqAnswerInsert);
-		}	
+		
 	}
+     echo json_encode(array('xx'=>$arr));	
+	$this->db->where('question_id', $question_id);
+    $this->db->update('more_than_one_mcq', array('mto_mcq' => $mtoMcqQuestion));
+    //echo $exam_id;
+}
+public function updateDescQuestion()
+{
+	$question_id = $this->input->post('question_id');
+	$descQuestion = $this->input->post('descQuestion');
+	$exam_id = $this->input->post('exam_id');
+
+	$this->db->where('question_id', $question_id);
+    $this->db->update('descriptive', array('descriptive' => $descQuestion));
+    echo $exam_id;
 }
 }

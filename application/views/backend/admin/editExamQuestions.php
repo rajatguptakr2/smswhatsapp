@@ -91,7 +91,7 @@
 				    		<button type="button" class="btn btn-success" name="submitMcq" onclick="addMcqQues();">Submit MCQ</button>
 				    	</div>			    	
 				      </div>
-				      <div class="modal-footer">
+				      <div class="modal-footer" style="border: none;">
 				        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 				      </div>
 				    </div>
@@ -148,16 +148,16 @@
 				      		<div id="mtoMcqOptAnswer" class="collapse">
 				      			<div class="form-group col-sm-4 col-sm-offset-4">
 									<div class="checkbox">
- 										<label><input type="checkbox" name="checkboxlist" value="">Option 1</label>
+ 										<label><input type="checkbox" name="checkboxlist" value="1">Option 1</label>
 								  	</div>
 							   		<div class="checkbox">
-									  	<label><input type="checkbox" name="checkboxlist" value="">Option 2</label>
+									  	<label><input type="checkbox" name="checkboxlist" value="2">Option 2</label>
 									</div>
 									<div class="checkbox disabled">
-									  	<label><input type="checkbox" name="checkboxlist" value="">Option 3</label>
+									  	<label><input type="checkbox" name="checkboxlist" value="3">Option 3</label>
 									</div>
 									<div class="checkbox disabled">
-									  	<label><input type="checkbox" name="checkboxlist" value="">Option 4</label>
+									  	<label><input type="checkbox" name="checkboxlist" value="4">Option 4</label>
 									</div>
 								</div>
 				      		</div>			        	
@@ -168,7 +168,7 @@
 				    		<button type="button" class="btn btn-success" name="submitMtoMcq" onclick="addMtoMcqQues();">Submit MCQ</button>
 				    	</div>			    	
 				      </div>
-				      <div class="modal-footer">
+				      <div class="modal-footer" style="border: none;">
 				        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 				      </div>
 				    </div>
@@ -201,7 +201,7 @@
 				    		<button type="button" class="btn btn-success" name="submitDesc" onclick="addDescQues();">Submit Descriptive Question</button>
 				    	</div>				    					    	
 				      </div>
-				      <div class="modal-footer">
+				      <div class="modal-footer" style="border: none;">
 				        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 				      </div>
 				    </div>
@@ -265,6 +265,34 @@
 												</div>
 											</div>
 											<div class="clearfix"></div>
+											<div class="col-sm-8 col-sm-offset-2 text-center">
+											<a href="<?php echo base_url().'index.php?admin/mcqQuestionEdit/'.$rowmcq->question_id;?>" class="btn btn-info"><i class="fa fa-cog" aria-hidden="true"></i>Edit</a>	
+		        		
+											<?php echo '<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal'.$rowmcq->question_id.'"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</button>';?>
+						                <!-- Modal -->
+						                <?php echo '<div id="myModal'.$rowmcq->question_id.'" class="modal fade" role="dialog">'; ?>
+						                  <div class="modal-dialog">
+
+						                    <!-- Modal content-->
+						                    <div class="modal-content">
+						                      <div class="modal-header">
+						                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+						                        <h5 class="modal-title">Delete This Exam</h5>
+						                      </div>
+						                      <div class="modal-body text-center">
+						                        Do You Want To Delete This Examination Event?
+						                        <br>
+						                        <div>
+						                        <?php echo '<button type="button" class="btn btn-danger"  id="deleteYes" value='.$rowmcq->question_id.'><i class="fa fa-check" aria-hidden="true"></i> Yes</button>';?>
+						                        <?php echo '<button type="button" class="btn btn-danger"  id="deleteNo" value='.$rowmcq->question_id.'><i class="fa fa-times" aria-hidden="true"></i> No</button>' ?>
+						                        </div>
+						                      </div>
+						                      <div class="modal-footer">
+						                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						                      </div>
+						                    </div>
+						                  </div>
+											</div>
 											</fieldset>											
 								</div>							
     						<?php
@@ -289,7 +317,7 @@
 												<div class="panel-body">
 													<ol>
 													<?php
-													foreach ($rowmtomcq->options as $option)
+													foreach ($rowmtomcq->optionss as $option)
 									    				{?>
 									    					<li>
 												    			<?php echo $option->value;?>
@@ -311,6 +339,34 @@
 												</div>
 											</div>
 											<div class="clearfix"></div>
+											<div class="col-sm-8 col-sm-offset-2 text-center">
+											<a href="<?php echo base_url().'index.php?admin/mtoMcqQuestionEdit/'.$rowmtomcq->question_id;?>" class="btn btn-info"><i class="fa fa-cog" aria-hidden="true"></i>Edit</a>	
+		        		
+											<?php echo '<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal'.$rowmtomcq->question_id.'"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</button>';?>
+						                <!-- Modal -->
+						                <?php echo '<div id="myModal'.$rowmtomcq->question_id.'" class="modal fade" role="dialog">'; ?>
+						                  <div class="modal-dialog">
+
+						                    <!-- Modal content-->
+						                    <div class="modal-content">
+						                      <div class="modal-header">
+						                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+						                        <h5 class="modal-title">Delete This Exam</h5>
+						                      </div>
+						                      <div class="modal-body text-center">
+						                        Do You Want To Delete This Examination Event?
+						                        <br>
+						                        <div>
+						                        <?php echo '<button type="button" class="btn btn-danger"  id="deleteYes" value='.$rowmtomcq->question_id.'><i class="fa fa-check" aria-hidden="true"></i> Yes</button>';?>
+						                        <?php echo '<button type="button" class="btn btn-danger"  id="deleteNo" value='.$rowmtomcq->question_id.'><i class="fa fa-times" aria-hidden="true"></i> No</button>' ?>
+						                        </div>
+						                      </div>
+						                      <div class="modal-footer">
+						                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						                      </div>
+						                    </div>
+						                  </div>
+						              </div>
 											</fieldset>											
 								</div>							
     						<?php
@@ -331,9 +387,38 @@
 												<div class="panel-body">
 													<p><?php echo $rowdesc->descriptive;?></p>
 												</div>
-											</div>					
+											</div>
+											<div class="col-sm-8 col-sm-offset-2 text-center">
+										<a href="<?php echo base_url().'index.php?admin/descQuestionEdit/'.$rowdesc->question_id;?>" class="btn btn-info"><i class="fa fa-cog" aria-hidden="true"></i>Edit</a>	
+		        		
+											<?php echo '<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal'.$rowdesc->question_id.'"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</button>';?>
+						                <!-- Modal -->
+						                <?php echo '<div id="myModal'.$rowdesc->question_id.'" class="modal fade" role="dialog">'; ?>
+						                  <div class="modal-dialog">
+
+						                    <!-- Modal content-->
+						                    <div class="modal-content">
+						                      <div class="modal-header">
+						                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+						                        <h5 class="modal-title">Delete This Exam</h5>
+						                      </div>
+						                      <div class="modal-body text-center">
+						                        Do You Want To Delete This Examination Event?
+						                        <br>
+						                        <div>
+						                        <?php echo '<button type="button" class="btn btn-danger"  id="deleteYes" value='.$rowdesc->question_id.'><i class="fa fa-check" aria-hidden="true"></i> Yes</button>';?>
+						                        <?php echo '<button type="button" class="btn btn-danger"  id="deleteNo" value='.$rowdesc->question_id.'><i class="fa fa-times" aria-hidden="true"></i> No</button>' ?>
+						                        </div>
+						                      </div>
+						                      <div class="modal-footer">
+						                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						                      </div>
+						                    </div>
+						                    </div>
+						                  </div>					
 										</fieldset>				
 										<div class="clearfix"></div>
+										
 		            			</div>
 		            	    <?php
 		            		}
@@ -354,9 +439,33 @@
 			var target = $(this).attr('rel');
 			console.log(target);   				
 				$("div#"+target).css("display", "block").siblings("div").css("display", "none");   				
-			}); 
+		}); 
+
+		$('button#deleteYes').click(function(event) {	
+			deleteId = (this).value;
+			$.ajax({
+				        url: '<?php echo base_url();?>index.php?admin/deleteQuestion',
+				        type: 'POST',
+				        data: {
+				            deleteId : deleteId
+				        },
+				        async: false,
+				        success: function(datareturn) {
+				            console.log(datareturn);
+				            document.location.href = '<?php echo base_url();?>index.php?admin/examination';
+        				},
+        				error: function(XMLHttpRequest, textStatus, errorThrown) {
+   						  alert(errorThrown);
+  						}
+   					});
+
+		$('#myModal'+this.value).modal('toggle');
 		});
 
+		$('button#deleteNo').click(function(event) {		
+			$('#myModal'+this.value).modal('toggle');
+		});
+		
 		CKEDITOR.replace( 'editor1' );
 		CKEDITOR.replace( 'editor2' );
 		CKEDITOR.replace( 'editor3' );
@@ -368,7 +477,8 @@
 		CKEDITOR.replace( 'editor9' );
 		CKEDITOR.replace( 'editor10' );
 		CKEDITOR.replace( 'editor11' );
-	
+		});	
+		
 			function addDescQues()
     		{
     			console.log('wsfghfdefg');
@@ -401,7 +511,6 @@
     		}
     		function addMtoMcqQues()
     		{
-    			console.log('wsfghfdefg');
     			var mtoMcqQuestion = CKEDITOR.instances.mtoMcqQuestionTextbox.getData();
     			var mtoMcqOpt1 = CKEDITOR.instances.mtoMcqOpt1Textbox.getData();
     			var mtoMcqOpt2 = CKEDITOR.instances.mtoMcqOpt2Textbox.getData();
@@ -445,7 +554,7 @@
 				            },
 				        async: false,
 				        success: function(datareturn) {
-				            console.log('updated');
+				            console.log('updated done');
 				            document.location.href = '<?php echo base_url();?>index.php?admin/examinationEdit/'+examId;
         				},
         				error: function(XMLHttpRequest, textStatus, errorThrown) {

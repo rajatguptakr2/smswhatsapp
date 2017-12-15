@@ -81,7 +81,6 @@
 		                <!-- Modal -->
 		                <?php echo '<div id="myModal'.$row->exam_id.'" class="modal fade" role="dialog">'; ?>
 		                  <div class="modal-dialog">
-
 		                    <!-- Modal content-->
 		                    <div class="modal-content">
 		                      <div class="modal-header">

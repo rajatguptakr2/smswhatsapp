@@ -73,7 +73,7 @@
                                             {
                                               if($row2->group_id == $row->id)                            
                                               {?>                             
-                                                <p><?php echo $row2->name.'('.$row2->emergency_contact.')';?></p>
+                                                <p><?php echo $row2->name.'('.$row2->mobile_no.')';?></p>
                                               <?php } ?>
                                           <?php }?>
                                         </div>
