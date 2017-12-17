@@ -3721,10 +3721,6 @@ public function postmultipleGroupWhatsappMessage()
 				{
 		        	$number= $row->mobile_no;
 		        	$student_id = $row->student_id;
-		        	echo $student_id;
-		        	echo $number;
-		        	echo $message;
-
 		        	$response = $this->contact_gateway($student_id, $number, $message);
 		        	if (strpos($response, 'queued') !== false) {
 	 				  	array_push($sent_group, $number);
@@ -3814,8 +3810,7 @@ public function postgrouping()
 
 	 				foreach ( $this->input->post('mycheck') as $obj)
 					{
-						echo $obj;
-	 				
+						
 					$data2 = array(
        							 	'group_id' => $groupInsertId,
        							 	'student_id' => $obj
@@ -3916,12 +3911,75 @@ public function examination()
 			$this->db->select('*');
 			$this->db->from('exam');
 			$query = $this->db->get();
-			$page_data['page_title']    = get_phrase('Examination Portal');
+			$page_data['page_title']    = get_phrase('Online Examination Portal');
 		    $page_data['page_name']     = 'examination';
 		    $page_data['query']     	=  $query;
 		    $this->load->view('backend/index', $page_data);
 		}	
 }
+public function offline_examination()
+{
+	if ($this->session->userdata('admin_login') != 1)
+             redirect(base_url(), 'refresh');
+		else
+		{
+			$this->db->select('*');
+			$this->db->from('offline_exam');
+			$query = $this->db->get();
+			$page_data['page_title']    = get_phrase('Offline Examination Portal');
+		    $page_data['page_name']     = 'offline_examination';
+		    $page_data['query']     	=  $query;
+		    $this->load->view('backend/index', $page_data);
+		}	
+}
+ public function postAddOfflineExam()
+    {
+        if ($this->session->userdata('admin_login') != 1)
+             redirect(base_url(), 'refresh');
+		else
+		{   	
+
+           	$date = $this->input->post('date');
+			$name = $this->input->post('name');
+			$file_name = $this->input->post('file_upload');
+			$config['upload_path']          = 'uploads/question_papers/';
+            $config['allowed_types']        = 'pdf';
+            $this->db->select('*');
+			$this->db->from('offline_exam');
+			$query = $this->db->get();
+			$page_data['page_title']    = get_phrase('Offline Examination Portal');
+		    $page_data['page_name']     = 'offline_examination';
+		    $page_data['query']     	=  $query;
+		    
+		    $this->load->library('upload', $config);
+
+            if ( ! $this->upload->do_upload('file_upload'))
+            {
+                    $page_data['error'] = array('error' => $this->upload->display_errors());
+					$this->load->view('backend/index', $page_data);
+			 }
+            else
+            {
+                    $page_data['success'] = array('upload_data' => $this->upload->data());
+                    $insertRecord = array(
+		        		'name' => $name,
+		        		'date_of_exam'=> $date,
+		        		'file_name' => $file_name
+					);
+					$this->db->insert('offline_exam', $insertRecord);
+					$this->load->view('backend/index', $page_data);
+            }
+		}
+    }
+function download_question_paper()
+    {
+        $file_name = $this->input->post('download_file_name');
+        $this->load->helper('download');
+        $data = file_get_contents("uploads/question_papers/" . $file_name);
+        $name = $file_name;
+        force_download($name, $data);
+        var_dump($file_name);
+    }
 public function getAddExam()
 {
 	if ($this->session->userdata('admin_login') != 1)
@@ -3933,6 +3991,7 @@ public function getAddExam()
 		    $this->load->view('backend/index', $page_data);
 		}	
 }
+
 public function postAddExam()
 {
 	if ($this->session->userdata('admin_login') != 1)
@@ -4538,4 +4597,6 @@ public function updateDescQuestion()
     $this->db->update('descriptive', array('descriptive' => $descQuestion));
     echo $exam_id;
 }
+
+
 }

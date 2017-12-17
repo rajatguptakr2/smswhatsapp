@@ -681,12 +681,31 @@
             </a>
         </li>
         <!-- Examination -->
-        <li class="<?php if ($page_name == 'examination') echo 'active'; ?> ">
+         <li class="<?php
+            if ($page_name == 'examination' ||
+                    $page_name == 'offline_examination')
+                            echo 'opened active';
+            ?> ">
             <a href="<?php echo base_url(); ?>index.php?admin/examination">
-                <i class="entypo-graduation-cap"></i>
-                <span><?php echo get_phrase('Examination Portal'); ?></span>
+                     <i class="entypo-graduation-cap"></i>
+                    <span><?php echo get_phrase('Examination Portal'); ?></span>
             </a>
+            <ul>
+                <li class="<?php if ($page_name == 'examination') echo 'active'; ?> ">
+                    <a href="<?php echo base_url(); ?>index.php?admin/examination">
+                        <i class="entypo-dot"></i>
+                        <span><?php echo get_phrase('Online Examination'); ?></span>
+                    </a>
+                </li>
+                <li class="<?php if ($page_name == 'offline_examination') echo 'active'; ?> ">
+                    <a href="<?php echo base_url(); ?>index.php?admin/offline_examination">
+                        <i class="entypo-dot"></i>
+                        <span><?php echo get_phrase('Offline Examination'); ?></span>
+                    </a>
+                </li>
+            </ul>
         </li>
+
         <!-- SETTINGS -->
         <li class="<?php
         if ($page_name == 'system_settings' ||
