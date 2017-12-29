@@ -609,8 +609,14 @@ class Admin extends CI_Controller
                 $data['mobile_no']          = $this->input->post('mobile_no');
             }
 			if ($this->input->post('phone_no') != null) {
-                $data['phone']          = $this->input->post('phone_no');
+                $data['phone']          = '+91'.$this->input->post('phone_no');
             }
+   //           if ($this->input->post('mobile_no') != null) {
+   //              $data['mobile_no']          = $this->input->post('mob_code').$this->input->post('mobile_no');
+   //          }
+			// if ($this->input->post('phone_no') != null) {
+   //              $data['phone']          = $this->input->post('phone_code').$this->input->post('phone_no');
+   //          }
 			if ($this->input->post('qualification') != null) {
                 $data['qualification']          = $this->input->post('qualification');
             }
@@ -1632,7 +1638,6 @@ class Admin extends CI_Controller
         $this->load->helper('download');
         $data = file_get_contents("uploads/syllabus/" . $file_name);
         $name = $file_name;
-
         force_download($name, $data);
     }
 
@@ -3939,46 +3944,67 @@ public function offline_examination()
 		else
 		{   	
 
-           	$date = $this->input->post('date');
-			$name = $this->input->post('name');
-			$file_name = $this->input->post('file_upload');
-			$config['upload_path']          = 'uploads/question_papers/';
-            $config['allowed_types']        = 'pdf';
-            $this->db->select('*');
+           	$this->db->select('*');
 			$this->db->from('offline_exam');
 			$query = $this->db->get();
 			$page_data['page_title']    = get_phrase('Offline Examination Portal');
 		    $page_data['page_name']     = 'offline_examination';
 		    $page_data['query']     	=  $query;
-		    
-		    $this->load->library('upload', $config);
 
-            if ( ! $this->upload->do_upload('file_upload'))
+
+           	$date = $this->input->post('date');
+			$name = $this->input->post('name');
+			// $file_name = $this->input->post('file_upload');
+			// $config['upload_path']          = 'uploads/question_papers/';
+   //          $config['allowed_types']        = 'pdf';
+            
+		    
+		    // $this->load->library('upload', $config);
+
+		    $files = $_FILES['file_upload'];
+	        $this->load->library('upload');
+	        $config['upload_path']   =  'uploads/question_papers/';
+	        $config['allowed_types'] =  '*';
+	        $_FILES['file_upload']['name']     = $files['name'];
+	        $_FILES['file_upload']['type']     = $files['type'];
+	        $_FILES['file_upload']['tmp_name'] = $files['tmp_name'];
+	        $_FILES['file_upload']['size']     = $files['size'];
+	        //var_dump($files['name']);
+	        $this->upload->initialize($config);
+	        //$this->upload->do_upload('file_upload');
+
+	        if ( ! $this->upload->do_upload('file_upload'))
             {
                     $page_data['error'] = array('error' => $this->upload->display_errors());
 					$this->load->view('backend/index', $page_data);
-			 }
+			}
             else
             {
                     $page_data['success'] = array('upload_data' => $this->upload->data());
                     $insertRecord = array(
 		        		'name' => $name,
 		        		'date_of_exam'=> $date,
-		        		'file_name' => $file_name
+		        		'file_name' => $files['name']
 					);
 					$this->db->insert('offline_exam', $insertRecord);
 					$this->load->view('backend/index', $page_data);
             }
 		}
     }
-function download_question_paper()
+public function download_question_paper()
     {
         $file_name = $this->input->post('download_file_name');
         $this->load->helper('download');
-        $data = file_get_contents("uploads/question_papers/" . $file_name);
-        $name = $file_name;
-        force_download($name, $data);
-        var_dump($file_name);
+        if (file_exists ( "uploads/question_papers/" . $file_name )) {
+        	$data = file_get_contents("uploads/question_papers/" . $file_name);
+        	$name = $file_name;
+	        force_download($name, $data);
+	        // var_dump($name);        
+        }
+        else {
+        	var_dump("uploads/question_papers/" . $file_name);
+        }
+        
     }
 public function getAddExam()
 {
@@ -4046,6 +4072,7 @@ public function examinationEdit($exam_id){
 	    $this->db->join('mcq c', 'c.question_id=b.id', 'right');
 	    $this->db->join('mcq_answers d', 'c.id=d.mcq_id', 'right');
 	    $this->db->where('b.exam_id',$exam_id);
+	    $this->db->order_by('c.question_id', 'desc');
 	    $query2 = $this->db->get();
 
 	    $this->db->select('*');
@@ -4053,6 +4080,7 @@ public function examinationEdit($exam_id){
 	    $this->db->join('questions f', 'f.exam_id=e.exam_id', 'right');
 	    $this->db->join('descriptive g', 'g.question_id=f.id', 'right');
 	    $this->db->where('f.exam_id',$exam_id);
+	    $this->db->order_by('g.question_id', 'desc');	    
 	    $query3 = $this->db->get();
 
 	    $this->db->select('*');
@@ -4061,6 +4089,7 @@ public function examinationEdit($exam_id){
 	    $this->db->join('more_than_one_mcq j', 'j.question_id=i.id','right');
 	    $this->db->join('more_than_one_mcq_answers k', 'j.id=k.mto_mcq_id','right');
 	    $this->db->where('i.exam_id',$exam_id);
+	    $this->db->order_by('j.question_id', 'desc');
 	    $query4 = $this->db->get();
 
 	  
@@ -4113,6 +4142,7 @@ public function addDescQues()
 					 	'descriptive' => $question
 					);
 		$this->db->insert('descriptive', $data2);
+		$this->session->set_flashdata('Question' , get_phrase('Question Added Sucessfully'));
 	}
 }
 public function addMcqQues()
@@ -4123,11 +4153,11 @@ public function addMcqQues()
 	{
 		$exam_id =  $this->input->post('examId');
 		$mcqQuestion =  $this->input->post('mcqQuestion');
-		$mcqOpt1 =  $this->input->post('mcqOpt1');
-		$mcqOpt2 =  $this->input->post('mcqOpt2');
-		$mcqOpt3 =  $this->input->post('mcqOpt3');
-		$mcqOpt4 =  $this->input->post('mcqOpt4');
+		$mcqOpt =  $this->input->post('mcqOpt');
 		$mcqAnswer =  $this->input->post('mcqAnswer');
+		$no_of_options = $this->input->post('no_of_options');
+
+		// var_dump($mcqOpt['0']);
 				           
 		$insertIntoQuestions = array(
         		'exam_id' => $exam_id
@@ -4137,41 +4167,25 @@ public function addMcqQues()
 
 		$mcqQuestionInsert = array(
 					 	'question_id' => $question_id,
-					 	'mcq' => $mcqQuestion
+					 	'mcq' => $mcqQuestion,
+					 	'no_of_options' => $no_of_options
 					);
 		$this->db->insert('mcq', $mcqQuestionInsert);
 		$mcq_id = $this->db->insert_id();
 
-		for ($i=1; $i <=4 ; $i++) 
+
+
+		for($i=0; $i < $no_of_options ; $i++) 
 		{
-			if($i==1)
-			{
-				$mcqOptInsert = array(
-					 	'mcq_id' => $mcq_id,
-					 	'value' => $mcqOpt1
-				);	
-			}else if($i==2)
-			{
-				$mcqOptInsert = array(
-					 	'mcq_id' => $mcq_id,
-					 	'value' => $mcqOpt2
-				);	
-			}else if($i==3)
-			{
-				$mcqOptInsert = array(
-					 	'mcq_id' => $mcq_id,
-					 	'value' => $mcqOpt3
-				);	
-			}else if($i==4)
-			{
-				$mcqOptInsert = array(
-					 	'mcq_id' => $mcq_id,
-					 	'value' => $mcqOpt3
-				);	
-			}
-			
+			//var_dump($mcqOpt[$i]);
+			$mcqOptInsert = array(
+				 	'mcq_id' => $mcq_id,
+				 	'value' => $mcqOpt[$i]
+				 );
 			$this->db->insert('mcq_options', $mcqOptInsert);
-			if($mcqAnswer == $i)
+			var_dump($mcqOptInsert);
+			
+			if($mcqAnswer == $i+1)
 			{
 				$mcqAnswer = $this->db->insert_id();
 			}
@@ -4181,7 +4195,8 @@ public function addMcqQues()
 					 	'mcq_id' => $mcq_id,
 					 	'correct_options_id' => $mcqAnswer
 					);
-			$this->db->insert('mcq_answers', $mcqAnswerInsert);
+		$this->db->insert('mcq_answers', $mcqAnswerInsert);
+		$this->session->set_flashdata('Question' , get_phrase('Question Added Sucessfully'));
 	}
 }
 public function addMtoMcqQues()
@@ -4192,12 +4207,10 @@ public function addMtoMcqQues()
 	{
 		$exam_id =  $this->input->post('examId');
 		$mtoMcqQuestion =  $this->input->post('mtoMcqQuestion');
-		$mtoMcqOpt1 =  $this->input->post('mtoMcqOpt1');
-		$mtoMcqOpt2 =  $this->input->post('mtoMcqOpt2');
-		$mtoMcqOpt3 =  $this->input->post('mtoMcqOpt3');
-		$mtoMcqOpt4 =  $this->input->post('mtoMcqOpt4');
 		$mtoMcqAnswer =  $this->input->post('mtoMcqAnswer');
 		$question_id= '';
+		$mtoMcqOpt =  $this->input->post('mtoMcqOpt');
+		$no_of_options = $this->input->post('no_of_options');
 
 		$insertIntoQuestions = array(
         		'exam_id' => $exam_id
@@ -4207,39 +4220,19 @@ public function addMtoMcqQues()
 
 		$mtoMcqQuestionInsert = array(
 					 	'question_id' => $question_id,
-					 	'mto_mcq' => $mtoMcqQuestion
+					 	'mto_mcq' => $mtoMcqQuestion,
+					 	'no_of_options' => $no_of_options
 					);
 		$this->db->insert('more_than_one_mcq', $mtoMcqQuestionInsert);
 		$mto_mcq_id = $this->db->insert_id();
 		//$mtoMcqAnswerArray = array();
 			
-		for($i=1; $i <=4 ; $i++) 
+		for($i=0; $i < $no_of_options ; $i++) 
 		{	
-			if($i==1)
-			{
-				$mtoMcqOptInsert = array(
-					 	'mto_mcq_id' => $mto_mcq_id,
-					 	'value' => $mtoMcqOpt1
-					);
-			}else if($i==2)
-			{
-				$mtoMcqOptInsert = array(
-					 	'mto_mcq_id' => $mto_mcq_id,
-					 	'value' => $mtoMcqOpt2
-					);	
-			}else if($i==3)
-			{
-				$mtoMcqOptInsert = array(
-					 	'mto_mcq_id' => $mto_mcq_id,
-					 	'value' => $mtoMcqOpt3
-					);	
-			}else if($i==4)
-			{
-				$mtoMcqOptInsert = array(
-					 	'mto_mcq_id' => $mto_mcq_id,
-					 	'value' => $mtoMcqOpt4
-					);	
-			}
+			$mtoMcqOptInsert = array(
+				 	'mto_mcq_id' => $mto_mcq_id,
+				 	'value' => $mtoMcqOpt[$i]
+				);
 			
 			$this->db->insert('more_than_one_mcq_options', $mtoMcqOptInsert);
 			$mto_mcq_opt_id = $this->db->insert_id();
@@ -4247,25 +4240,26 @@ public function addMtoMcqQues()
 			
 			foreach ($mtoMcqAnswer as $key) 
 			{
-				if($key == $i)
+				if($key == $i+1)
 				{
 					$mtoMcqAnswerInsert = array(
 					 	'mto_mcq_id' => $mto_mcq_id,
 					 	'correct_options_id' => $mto_mcq_opt_id,
 					);
-					var_dump($mtoMcqAnswerInsert);
 					$this->db->insert('more_than_one_mcq_answers', $mtoMcqAnswerInsert);
 				}
 			}
 		}
+		$this->session->set_flashdata('Question' , get_phrase('Question Added Sucessfully'));
 	}
 }
 public function deleteQuestion($deleteId)
 {
 	$deleteId = $this->input->post('deleteId');
-	echo $deleteId.'hi';
-	// $this ->db-> where('id', $deleteId);
- //  	$this ->db-> delete('questions');
+	// echo $deleteId.'hi';
+	$this->db->where('id', $deleteId);
+  	$this->db->delete('questions');
+  	$this->session->set_flashdata('Question' , get_phrase('Question Deleted Sucessfully'));
 }
 public function mcqQuestionEdit($question_id)
 {
@@ -4274,10 +4268,22 @@ public function mcqQuestionEdit($question_id)
 	else
 	{
 		$exam_id = '';
+		$no_of_options = '';
 		$this->db->select('exam_id');
 		$this->db->from('questions');
 		$this->db->where('id', $question_id);
 		$query = $this->db->get();
+
+		$this->db->select('no_of_options');
+	    $this->db->from('mcq'); 
+	    $this->db->where('question_id',$question_id);
+	    $query2 = $this->db->get();
+	    foreach ($query2->result() as $row2) 
+	    {
+	    	$no_of_options =  (int)$row2->no_of_options;
+	    }
+
+
 		foreach ($query->result() as $row) 
 	    {
 	    	$exam_id =  $row->exam_id;
@@ -4286,6 +4292,8 @@ public function mcqQuestionEdit($question_id)
 		$page_data['page_title']    = get_phrase('Update Exam Questions');
 	    $page_data['page_name']     = 'updateExamMcqQuestion';
 	    $page_data['exam_id']     = $exam_id;
+	    $page_data['no_of_options']     = $no_of_options;
+	    //var_dump($no_of_options);
 	    $this->load->view('backend/index', $page_data);
 	}
 }
@@ -4305,6 +4313,16 @@ public function mtoMcqQuestionEdit($question_id)
 	    {
 	    	$exam_id =  $row->exam_id;
 	    }
+	    $this->db->select('no_of_options');
+	    $this->db->from('more_than_one_mcq'); 
+	    $this->db->where('question_id',$question_id);
+	    $query2 = $this->db->get();
+	    foreach ($query2->result() as $row2) 
+	    {
+	    	$no_of_options =  (int)$row2->no_of_options;
+	    }
+
+ 		$page_data['no_of_options']     = $no_of_options;
 		$page_data['question_id']     	=  $question_id;
 		$page_data['page_title']    = get_phrase('Update Exam Questions');
 	    $page_data['page_name']     = 'updateExamMtoMcqQuestion';
@@ -4450,21 +4468,20 @@ public function updateMcqQuestion()
 	$question_id = $this->input->post('question_id');
 	$mcqQuestion = $this->input->post('mcqQuestion');
 	$mcqAnswer =  $this->input->post('mcqAnswer');
-
-	echo $mcqAnswer;
-
-	$mcqOpt1 = $this->input->post('mcqOpt1');
-	$mcqOpt2 = $this->input->post('mcqOpt2');
-	$mcqOpt3 = $this->input->post('mcqOpt3');
-	$mcqOpt4 = $this->input->post('mcqOpt4');
+	$mcqOpt = $this->input->post('mcqOpt');
 	$exam_id = $this->input->post('exam_id');
+	$no_of_options = $this->input->post('no_of_options');
+	
+	// var_dump($mcqOpt);
+
+
 	$this->db->select('*');
 	$this->db->from('mcq');
 	$this->db->where('question_id', $question_id);
 	$query = $this->db->get();
 	foreach ($query->result() as $row) 
     {
-    	$mcq_id = $row->id;
+    	$mcq_id = (int)$row->id;
     }
 
     $this->db->select('id');
@@ -4472,51 +4489,36 @@ public function updateMcqQuestion()
 	$this->db->where('mcq_id', $mcq_id);
 	$this->db->order_by('id', 'asc');
 	$query2 = $this->db->get();
-	foreach ($query2->result() as $key=>$value) 
-    {
-    	
-    	if($key == '0')
-    	{
-    		$this->db->where('id', $value->id);
-    		$this->db->update('mcq_options', array('value' => $mcqOpt1));		
-    	}
-    	else if($key == '1')
-    	{
-    		$this->db->where('id', $value->id);
-    		$this->db->update('mcq_options', array('value' => $mcqOpt2));		
-    	}
-    	else if($key == '2')
-    	{
-    		$this->db->where('id', $value->id);
-    		$this->db->update('mcq_options', array('value' => $mcqOpt3));		
-    	}
-    	else if($key == '3')
-    	{
-    		$this->db->where('id', $value->id);
-    		$this->db->update('mcq_options', array('value' => $mcqOpt4));		
-    	} 
-    	if(($key+1) == $mcqAnswer)
-    	{
-    		$this->db->where('mcq_id', $mcq_id);
-   			$this->db->update('mcq_answers', array('correct_options_id' => $value->id));   
-    	}   	
-    }	    
+	for ($i=0; $i < $no_of_options; $i++) 
+	{ 
+		foreach ($query2->result() as $key=>$value) 
+	    {    	
+	    	if($key == $i)
+	    	{	    		
+	    		$this->db->where('id', $value->id);
+	    		$this->db->update('mcq_options', array('value' => $mcqOpt[$i]));		
+	    	}
+	    	if($mcqAnswer == $key+1)
+	    	{    		
+	    		$this->db->where('mcq_id', $mcq_id);
+	    		$this->db->update('mcq_answers', array('correct_options_id' => $value->id));		
+	    	}
+	    }
+	}
 	$this->db->where('question_id', $question_id);
     $this->db->update('mcq', array('mcq' => $mcqQuestion));
-	// echo $exam_id;
+	echo $exam_id;
+	$this->session->set_flashdata('Question' , get_phrase('Question Updated Sucessfully'));
 }
 public function updateMtoMcqQuestion()
 {
 	$question_id = $this->input->post('question_id');
+	$no_of_options = $this->input->post('no_of_options');
 	$mtoMcqQuestion = $this->input->post('mtoMcqQuestion');
-	$mtoMcqOpt1 = $this->input->post('mtoMcqOpt1');
-	$mtoMcqOpt2 = $this->input->post('mtoMcqOpt2');
-	$mtoMcqOpt3 = $this->input->post('mtoMcqOpt3');
-	$mtoMcqOpt4 = $this->input->post('mtoMcqOpt4');
+	$mtoMcqOpt = $this->input->post('mtoMcqOpt');
 	$exam_id = $this->input->post('exam_id');
 	$mtoMcqAnswer =  $this->input->post('mtoMcqAnswer');
 	$mto_mcq_id = '';
-
 	
 	$this->db->select('*');
 	$this->db->from('more_than_one_mcq');
@@ -4532,34 +4534,18 @@ public function updateMtoMcqQuestion()
 	$this->db->where('mto_mcq_id', $mto_mcq_id);
 	$this->db->order_by('id', 'asc');
 	$query2 = $this->db->get();
-	foreach ($query2->result() as $key=>$value) 
-    {
-    	
-    	if($key == '0')
-    	{
-    		$this->db->where('id', $value->id);
-    		$this->db->update('more_than_one_mcq_options', array('value' => $mtoMcqOpt1));		
-    	}
-    	else if($key == '1')
-    	{
-    		$this->db->where('id', $value->id);
-    		$this->db->update('more_than_one_mcq_options', array('value' => $mtoMcqOpt2));		
-    	}
-    	else if($key == '2')
-    	{
-    		$this->db->where('id', $value->id);
-    		$this->db->update('more_than_one_mcq_options', array('value' => $mtoMcqOpt3));		
-    	}
-    	else if($key == '3')
-    	{
-    		$this->db->where('id', $value->id);
-    		$this->db->update('more_than_one_mcq_options', array('value' => $mtoMcqOpt4));		
-    	}
-    	
-    }
-
-
-
+	for ($i=0; $i < $no_of_options; $i++) 
+	{ 
+		foreach ($query2->result() as $key=>$value) 
+	    {
+	    	
+	    	if($key == $i)
+	    	{
+	    		$this->db->where('id', $value->id);
+	    		$this->db->update('more_than_one_mcq_options', array('value' => $mtoMcqOpt[$i]));		
+	    	}
+	    }
+	}
     //update answer
     $this->db->where('mto_mcq_id', $mto_mcq_id);
   	$this->db->delete('more_than_one_mcq_answers');
@@ -4567,25 +4553,22 @@ public function updateMtoMcqQuestion()
 	foreach ($mtoMcqAnswer as $thisAnswer) 
 	{
 		foreach ($query2->result() as $key => $value) 
-		{
-			
+		{			
 			if(($key+1) == $thisAnswer)
 			{
 				$mtoMcqAnswerInsert = array(
 				 	'mto_mcq_id' => $mto_mcq_id,
 				 	'correct_options_id' => $value->id,
 				);
-
 				$this->db->insert('more_than_one_mcq_answers', $mtoMcqAnswerInsert);
 			}	
-		}
-
-		
+		}		
 	}
-     echo json_encode(array('xx'=>$arr));	
+    //echo json_encode(array('xx'=>$arr));	
 	$this->db->where('question_id', $question_id);
     $this->db->update('more_than_one_mcq', array('mto_mcq' => $mtoMcqQuestion));
-    //echo $exam_id;
+    echo $exam_id;
+    $this->session->set_flashdata('Question' , get_phrase('Question Updated Sucessfully'));
 }
 public function updateDescQuestion()
 {
@@ -4596,6 +4579,7 @@ public function updateDescQuestion()
 	$this->db->where('question_id', $question_id);
     $this->db->update('descriptive', array('descriptive' => $descQuestion));
     echo $exam_id;
+    $this->session->set_flashdata('Question' , get_phrase('Question Updated Sucessfully'));
 }
 
 

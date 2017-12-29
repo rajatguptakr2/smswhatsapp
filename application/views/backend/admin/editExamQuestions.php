@@ -1,5 +1,14 @@
 <hr>
 <div class="row">
+		<?php
+			if(!empty($this->session->flashdata('Question')))
+			{
+				echo '<div class="alert alert-success">';
+				echo $this->session->flashdata('Question');
+				echo '</div>';
+	
+			}
+		?>
 	<div class="panel panel-info">
       <div class="panel-heading"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Manage Questions</div>
       <div class="panel-body">
@@ -40,55 +49,39 @@
 				        <h4 class="modal-title">ADD MCQ</h4>
 				       </div>
 				      <div class="modal-body">
-				      	<div id="mcqQuesDiv" style="cursor: pointer;" data-toggle="tooltip" title="Click To Enter Question">
-				      		<h4 data-toggle="collapse" data-target="#mcqQuestion">Your Question</h4> <hr>
-				        	<div  id="mcqQuestion" class="collapse">
+				      	<div id="mcqQuesDiv" style="cursor: pointer;">
+				      		<h4>Your Question</h4> <hr>
+				        	<div  id="mcqQuestion">
 				        		<textarea name="editor1"  id="mcqQuestionTextbox"></textarea>	
-				        	</div>
-				        	
+				        	</div>				        	
 				    	</div>
-				    	<div id="mcqOpt1Div" style="cursor: pointer;" data-toggle="tooltip" title="Click To Enter Option">
-				      		<h4 data-toggle="collapse" data-target="#mcqOpt1">Option 1</h4> <hr>
-				        	<div  id="mcqOpt1" class="collapse">
-				        		<textarea name="editor2" id="mcqOpt1Textbox"></textarea>	
-				        	</div>			        	
-				    	</div>
-				    	<div id="mcqOpt2Div" style="cursor: pointer;" data-toggle="tooltip" title="Click To Enter Option">
-				      		<h4 data-toggle="collapse" data-target="#mcqOpt2">Option 2</h4> <hr>
-				      		<div  id="mcqOpt2" class="collapse">
-				      			<textarea name="editor3" id="mcqOpt2Textbox"></textarea>	
-				      		</div>			        	
-				    	</div> 
-				    	<div id="mcqOpt3Div" style="cursor: pointer;" data-toggle="tooltip" title="Click To Enter Option">
-				      		<h4 data-toggle="collapse" data-target="#mcqOpt3">Option 3</h4> <hr>
-				      		<div  id="mcqOpt3" class="collapse">
-				      			<textarea name="editor4" id="mcqOpt3Textbox"></textarea>	
-				      		</div>			        	
-				    	</div>
-				    	<div id="mcqOpt4Div" style="cursor: pointer;" data-toggle="tooltip" title="Click To Enter Option">
-				      		<h4 data-toggle="collapse" data-target="#mcqOpt4">Option 4</h4> <hr>
-				      		<div id="mcqOpt4" class="collapse">
-				      			<textarea name="editor5" id="mcqOpt4Textbox"></textarea>	
-				      		</div>			        	
-				    	</div>
-				    	<div id="mcqAnswerDiv" style="cursor: pointer;" data-toggle="tooltip" title="Click To Enter Correct Option">
-				      		<h4 data-toggle="collapse" data-target="#mcqAnswer">Select Answer</h4> <hr>
-				      		<div id="mcqAnswer" class="collapse">
+				    	<br>
+				    	<div class="row">
+						  <div class="col-lg-6" id="no_of_options" style="cursor: pointer;" title="No of Options">
+						    <div class="input-group">
+						      <input type="number" min="2" id="no_of_options_input" class="form-control" placeholder="No Of Options">
+						      <span class="input-group-btn">
+						        <button type="button" class="btn btn-success" name="no_of_options_ok" onclick="noOfMcqOptions();">Go!</button>
+						      </span>
+						    </div>
+						  </div>
+						</div>
+						<br>
+						<div id="mcqOptions">
+						</div>
+						<br>
+				    	<div id="mcqAnswerDiv" style="cursor: pointer;">
+				      		<h4 >Select Answer</h4> <hr>
+				      		<div id="mcqAnswer" >
 				      			<div class="form-group col-sm-4 col-sm-offset-4">
-								  <select class="form-control" id="mcqansweroption">
-								    <option>Enter Choice</option>
-								    <option>1</option>
-								    <option>2</option>
-								    <option>3</option>
-								    <option>4</option>
-								  </select>
+								  <select class="form-control" id="mcqansweroption"></select>
 								</div>
 				      		</div>			        	
 				    	</div>
-				    	<div class="submitMcqBtn col-sm-8 col-sm-offset-2 text-center">
+				    	<div class="col-sm-8 col-sm-offset-2 text-center" id="submitMcqBtn">
 				    		<div id="mcqQuesErrDiv" style="color: red;"></div>				    		
 				    		<input type="hidden" name="mcq_exam_id" id="mcq_exam_id" value="<?php echo $exam_id;?>">
-				    		<button type="button" class="btn btn-success" name="submitMcq" onclick="addMcqQues();">Submit MCQ</button>
+				    		<button type="button" class="btn btn-success" name="submitMcq" onclick="addMcqQues();">Submit</button>
 				    	</div>			    	
 				      </div>
 				      <div class="modal-footer" style="border: none;">
@@ -110,63 +103,41 @@
 				      <div class="modal-header">
 				        <button type="button" class="close" data-dismiss="modal">&times;</button>
 				        <h4 class="modal-title">ADD More Than One Correct MCQ</h4>
-				       </div>
+				      </div>
 				      <div class="modal-body">
-				      	<div id="mcqMtoQuesDiv" style="cursor: pointer;" data-toggle="tooltip" title="Click To Enter Question">
-				      		<h4 data-toggle="collapse" data-target="#mcqMtoQuestion">Your Question</h4> <hr>
-				        	<div  id="mcqMtoQuestion" class="collapse">
+				      	<div id="mcqMtoQuesDiv" style="cursor: pointer;">
+				      		<h4>Your Question</h4> <hr>
+				        	<div  id="mcqMtoQuestion">
 				        		<textarea name="editor6" id="mtoMcqQuestionTextbox"></textarea>	
-				        	</div>
-				        	
+				        	</div>				        	
 				    	</div>
-				    	<div id="mcqMtoOpt1Div" style="cursor: pointer;" data-toggle="tooltip" title="Click To Enter Option">
-				      		<h4 data-toggle="collapse" data-target="#mcqMtoOpt1">Option 1</h4> <hr>
-				        	<div  id="mcqMtoOpt1" class="collapse">
-				        		<textarea name="editor7" id="mtoMcqOpt1Textbox"></textarea>	
-				        	</div>			        	
-				    	</div>
-				    	<div id="mcqMtoOpt2Div" style="cursor: pointer;" data-toggle="tooltip" title="Click To Enter Option">
-				      		<h4 data-toggle="collapse" data-target="#mcqMtoOpt2">Option 2</h4> <hr>
-				      		<div  id="mcqMtoOpt2" class="collapse">
-				      			<textarea name="editor8" id="mtoMcqOpt2Textbox"></textarea>	
-				      		</div>			        	
-				    	</div> 
-				    	<div id="mcqMtoOpt3Div" style="cursor: pointer;" data-toggle="tooltip" title="Click To Enter Option">
-				      		<h4 data-toggle="collapse" data-target="#mcqMtoOpt3">Option 3</h4> <hr>
-				      		<div  id="mcqMtoOpt3" class="collapse">
-				      			<textarea name="editor9" id="mtoMcqOpt3Textbox"></textarea>	
-				      		</div>			        	
-				    	</div>
-				    	<div id="mcqMtoOpt4Div" style="cursor: pointer;" data-toggle="tooltip" title="Click To Enter Option">
-				      		<h4 data-toggle="collapse" data-target="#mcqMtoOpt4">Option 4</h4> <hr>
-				      		<div id="mcqMtoOpt4" class="collapse">
-				      			<textarea name="editor10" id="mtoMcqOpt4Textbox"></textarea>	
+				    	<br>
+				    	<div class="row">
+						  <div class="col-lg-6" id="no_of_mto_options" style="cursor: pointer;" title="No of Options">
+						    <div class="input-group">
+						      <input type="number" min="2" id="no_of_mto_options_input" class="form-control" placeholder="No Of Options">
+						      <span class="input-group-btn">
+						        <button type="button" class="btn btn-success" name="no_of_mto_options_ok" onclick="noOfMtoMcqOptions();">Go!</button>
+						      </span>
+						    </div>
+						  </div>
+						</div>
+						<br>
+						<div id="mtoMcqOptions">
+						</div>
+						<br>
+				    	<div id="mtoMcqAnswerDiv" style="cursor: pointer;">
+				      		<h4>Select Answer</h4><hr>
+				      		<div id="mtoMcqAnswer">
+				      			<div class="form-group col-sm-4 col-sm-offset-4" id="mtomcqansweroption"> 				
+				      			</div>
 				      		</div>			        	
 				    	</div>
-				    	<div id="mcqOptAnswerDiv" style="cursor: pointer;" data-toggle="tooltip" title="Click To Enter Correct Option">
-				      		<h4 data-toggle="collapse" data-target="#mtoMcqOptAnswer">Select Answer</h4> <hr>
-				      		<div id="mtoMcqOptAnswer" class="collapse">
-				      			<div class="form-group col-sm-4 col-sm-offset-4">
-									<div class="checkbox">
- 										<label><input type="checkbox" name="checkboxlist" value="1">Option 1</label>
-								  	</div>
-							   		<div class="checkbox">
-									  	<label><input type="checkbox" name="checkboxlist" value="2">Option 2</label>
-									</div>
-									<div class="checkbox disabled">
-									  	<label><input type="checkbox" name="checkboxlist" value="3">Option 3</label>
-									</div>
-									<div class="checkbox disabled">
-									  	<label><input type="checkbox" name="checkboxlist" value="4">Option 4</label>
-									</div>
-								</div>
-				      		</div>			        	
-				    	</div>
-				    	<div class="submitMtoMcqBtn col-sm-8 col-sm-offset-2 text-center">
+				    	<div class="col-sm-8 col-sm-offset-2 text-center" id="submitMtoMcqBtn">
 				    		<div id="mtoMcqQuesErrDiv" style="color: red;"></div>				    		
-				    		<input type="hidden" name="mto_mcq_exam_id" id="mto_mcq_exam_id" value="<?php echo $exam_id;?>">	
-				    		<button type="button" class="btn btn-success" name="submitMtoMcq" onclick="addMtoMcqQues();">Submit MCQ</button>
-				    	</div>			    	
+				    		<input type="hidden" name="mto_mcq_exam_id" id="mto_mcq_exam_id" value="<?php echo $exam_id;?>">
+				    		<button type="button" class="btn btn-success" name="submitMtoMcq" onclick="addMtoMcqQues();">Submit</button>
+				    	</div>		    	
 				      </div>
 				      <div class="modal-footer" style="border: none;">
 				        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -189,9 +160,9 @@
 				        <h4 class="modal-title">ADD Descriptive Question</h4>
 				       </div>
 				      <div class="modal-body">
-				      	<div id="descQuesDiv" style="cursor: pointer;" data-toggle="tooltip" title="Click To Enter Question">
-				      		<h4 data-toggle="collapse" data-target="#descQuestion">Your Question</h4> <hr>
-				        	<div  id="descQuestion" class="collapse">
+				      	<div id="descQuesDiv" style="cursor: pointer;">
+				      		<h4 data-toggle="collapse">Your Question</h4> <hr>
+				        	<div  id="descQuestion">
 				        		<textarea name="editor11" id="descQuestionTextbox"></textarea>	
 				        	</div>				        	
 				    	</div>
@@ -226,10 +197,16 @@
 				</button> 
 		  	</div>
 		  	<div class="col-sm-12 ">
-			  	<div id="mcq" style="display: none">
-			  		<hr>
+			  	<div id="mcq" style="">
+			  		<h2 class="text-center"> Single Correct MCQ Questions</h2>
 			  		<div col-sm-10 col-sm-offset-1" id="mcqQuestions">
+            				
             				<?php
+            				// if($query2->num_rows() <= 0))
+            				// {
+            				// 	echo '<p style="color:red" class="text-center">No Question Added Yet.</p>'
+            				// }
+            				// else{
             				foreach ($query2->result() as $rowmcq)
     						{?>
     							<div class="thisMcq">            
@@ -292,8 +269,8 @@
 						                      </div>
 						                    </div>
 						                  </div>
-											</div>
-											</fieldset>											
+										</div>
+									</fieldset>											
 								</div>							
     						<?php
     						}
@@ -301,19 +278,27 @@
 			  		</div>
 			  	</div>
 			  	<div id="mto_mcq" style="display: none">
-			  		<hr>
+			  		<h2 class="text-center"> More Than One Correct MCQ Questions</h2>
 				  	<div  col-sm-10 col-sm-offset-1" id="mto_mcqQuestions">
 				  		<?php
+				  			// if($query4->num_rows()<=0)
+         //    				{
+         //    					echo '<p style="color:red" class="text-center">No Question Added Yet.</p>'
+         //    				}
+         //    				else{
+				  			$old = '';
             				foreach ($query4->result() as $rowmtomcq)
-    						{?>
+    						{	
+    							if( $old !=$rowmtomcq->question_id){
+    							?>
     							<div class="thisMtoMcq">            
-			            					<fieldset class="col-md-12">    	
-												<legend>#Question</legend>	
-											<div class="panel panel-default">		
-												<div class="panel-body">
-													<p><?php echo $rowmtomcq->mto_mcq;?></p>
-												</div>
-												<div class="panel panel-default">
+			            			<fieldset class="col-md-12">    	
+										<legend>#Question</legend>	
+										<div class="panel panel-default">		
+											<div class="panel-body">
+												<p><?php echo $rowmtomcq->mto_mcq;?></p>
+											</div>
+											<div class="panel panel-default">
 												<div class="panel-body">
 													<ol>
 													<?php
@@ -326,58 +311,63 @@
 														}?>
 													</ol>							    						
 									    		</div>
-												</div>
 											</div>
-											<div class="panel panel-default">
-												<div class="panel-body">
-													<?php 
-													foreach ($rowmtomcq->correct_options as $correct_option_value)
-									    				{?>
-									    					<p><?php echo $correct_option_value->value;?></p>
-														<?php
-									    				}?>
-												</div>
+										</div>
+										<div class="panel panel-default">
+											<div class="panel-body">
+												<?php 
+												foreach ($rowmtomcq->correct_options as $correct_option_value)
+								    				{?>
+								    					<p><?php echo $correct_option_value->value;?></p>
+													<?php
+								    				}?>
 											</div>
-											<div class="clearfix"></div>
-											<div class="col-sm-8 col-sm-offset-2 text-center">
+										</div>
+										<div class="clearfix"></div>
+										<div class="col-sm-8 col-sm-offset-2 text-center">
 											<a href="<?php echo base_url().'index.php?admin/mtoMcqQuestionEdit/'.$rowmtomcq->question_id;?>" class="btn btn-info"><i class="fa fa-cog" aria-hidden="true"></i>Edit</a>	
 		        		
 											<?php echo '<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal'.$rowmtomcq->question_id.'"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</button>';?>
 						                <!-- Modal -->
 						                <?php echo '<div id="myModal'.$rowmtomcq->question_id.'" class="modal fade" role="dialog">'; ?>
-						                  <div class="modal-dialog">
-
-						                    <!-- Modal content-->
-						                    <div class="modal-content">
-						                      <div class="modal-header">
-						                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-						                        <h5 class="modal-title">Delete This Exam</h5>
-						                      </div>
-						                      <div class="modal-body text-center">
-						                        Do You Want To Delete This Examination Event?
-						                        <br>
-						                        <div>
-						                        <?php echo '<button type="button" class="btn btn-danger"  id="deleteYes" value='.$rowmtomcq->question_id.'><i class="fa fa-check" aria-hidden="true"></i> Yes</button>';?>
-						                        <?php echo '<button type="button" class="btn btn-danger"  id="deleteNo" value='.$rowmtomcq->question_id.'><i class="fa fa-times" aria-hidden="true"></i> No</button>' ?>
-						                        </div>
-						                      </div>
-						                      <div class="modal-footer">
-						                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-						                      </div>
-						                    </div>
-						                  </div>
-						              </div>
-											</fieldset>											
-								</div>							
+							                <div class="modal-dialog">
+							                    <div class="modal-content">
+							                      <div class="modal-header">
+							                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+							                        <h5 class="modal-title">Delete This Exam</h5>
+							                      </div>
+							                      <div class="modal-body text-center">
+							                        Do You Want To Delete This Examination Event?
+							                        <br>
+							                        <div>
+							                        <?php echo '<button type="button" class="btn btn-danger"  id="deleteYes" value='.$rowmtomcq->question_id.'><i class="fa fa-check" aria-hidden="true"></i> Yes</button>';?>
+							                        <?php echo '<button type="button" class="btn btn-danger"  id="deleteNo" value='.$rowmtomcq->question_id.'><i class="fa fa-times" aria-hidden="true"></i> No</button>' ?>
+							                        </div>
+							                      </div>
+							                      <div class="modal-footer">
+							                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+							                      </div>
+							                    </div>
+							                </div>
+						              	</div>
+									</fieldset>											
+								</div>
     						<?php
-    						}
+    							}
+								$old = $rowmtomcq->question_id;	
+							}
             				?>	    
 			  		</div> 			
 				</div>  				
 			  	<div id="descriptive" style="display: none">
-			  		<hr>
+			  		<h2 class="text-center"> Descriptive Questions</h2>
 				  	<div col-sm-10 col-sm-offset-1" id="descQuestions">
 				  		<?php
+            				// if($query3->num_rows() <= 0)
+            				// {
+            				// 	echo '<p style="color:red" class="text-center">No Question Added Yet.</p>'
+            				// }
+            				// else{
             				foreach ($query3->result() as $rowdesc)
     						{?>
 						  		<div class="thisDesc">            
@@ -434,25 +424,33 @@
 <script>
 		
 		$(document).ready(function(){
+
+
+
+		$("div#mcqAnswerDiv").css("display", "none");
+		$("div#submitMcqBtn").css("display", "none");
+		$("div#mtoMcqAnswerDiv").css("display", "none");
+		$("div#submitMtoMcqBtn").css("display", "none");
 		$('[data-toggle="tooltip"]').tooltip();  
 		$('button.selectQues').on('click', function(){
 			var target = $(this).attr('rel');
 			console.log(target);   				
 				$("div#"+target).css("display", "block").siblings("div").css("display", "none");   				
 		}); 
-
+		
 		$('button#deleteYes').click(function(event) {	
 			deleteId = (this).value;
+			var exam_id = <?php echo $exam_id;?>;
 			$.ajax({
 				        url: '<?php echo base_url();?>index.php?admin/deleteQuestion',
 				        type: 'POST',
 				        data: {
-				            deleteId : deleteId
+				            deleteId : deleteId,
 				        },
 				        async: false,
 				        success: function(datareturn) {
 				            console.log(datareturn);
-				            document.location.href = '<?php echo base_url();?>index.php?admin/examination';
+				             document.location.href = '<?php echo base_url();?>index.php?admin/examinationEdit/'+exam_id;
         				},
         				error: function(XMLHttpRequest, textStatus, errorThrown) {
    						  alert(errorThrown);
@@ -467,18 +465,56 @@
 		});
 		
 		CKEDITOR.replace( 'editor1' );
-		CKEDITOR.replace( 'editor2' );
-		CKEDITOR.replace( 'editor3' );
-		CKEDITOR.replace( 'editor4' );
-		CKEDITOR.replace( 'editor5' );
-		CKEDITOR.replace( 'editor6' );
-		CKEDITOR.replace( 'editor7' );
-		CKEDITOR.replace( 'editor8' );
-		CKEDITOR.replace( 'editor9' );
-		CKEDITOR.replace( 'editor10' );
+		CKEDITOR.replace( 'editor6' );		
 		CKEDITOR.replace( 'editor11' );
 		});	
-		
+			
+			function noOfMcqOptions(){
+				var no_of_options = $('#no_of_options_input').val();
+				var newdiv;
+				if ($('.mcqOptInput').length) {
+					$('.mcqOptInput').remove();
+					$('.mcqOptionsInput').remove();
+					$("div#mcqAnswerDiv").css("display", "none");	
+					$("div#submitMcqBtn").css("display", "none");	
+					}
+				var j;
+
+				$('#mcqansweroption').append('<option class="mcqOptionsInput">Enter Choice</option>');
+
+			    for(var i = 0; i < no_of_options; i++) {
+			    	j=i+1;
+			        newMcqOptdiv = $('<div id="mcqOpt'+j+'Div" style="cursor: pointer;" data-toggle="tooltip" title="Click To Enter Option" class="mcqOptInput"><h4 data-toggle="collapse" data-target="#mcqOpt'+j+'">Option '+j+'</h4><hr><div  id="mcqOpt'+j+'" class="collapse"><textarea name="mcqOptEditor'+j+'" id="mcqOpt'+j+'Textbox"></textarea></div></div>');
+			        $('#mcqOptions').append(newMcqOptdiv);
+
+			    	CKEDITOR.replace( 'mcqOptEditor'+j+'');		    	
+			    	$('#mcqansweroption').append('<option class="mcqOptionsInput">'+j+'</option>');
+			    	}
+			    	$("div#mcqAnswerDiv").css("display", "block");			    	
+			    	$("div#submitMcqBtn").css("display", "block");
+			}
+			function noOfMtoMcqOptions(){
+				var no_of_options = $('#no_of_mto_options_input').val();
+				var newdiv;
+				if ($('.mtoMcqOptInput').length) {
+					$('.mtoMcqOptInput').remove();
+					$('.checkbox').remove();
+					$("div#mtoMcqAnswerDiv").css("display", "none");	
+					$("div#submitMtoMcqBtn").css("display", "none");	
+					}
+				var j;
+
+			    for (var i = 0; i < no_of_options; i++) {
+			    	j=i+1;
+			        newMtoMcqOptdiv = $('<div id="mtoMcqOpt'+j+'Div" style="cursor: pointer;" data-toggle="tooltip" title="Click To Enter Option" class="mtoMcqOptInput"><h4 data-toggle="collapse" data-target="#mtoMcqOpt'+j+'">Option '+j+'</h4><hr><div  id="mtoMcqOpt'+j+'" class="collapse"><textarea name="mtoMcqOptEditor'+j+'" id="mtoMcqOpt'+j+'Textbox"></textarea></div></div>');
+			        $('#mtoMcqOptions').append(newMtoMcqOptdiv);
+
+			    	CKEDITOR.replace( 'mtoMcqOptEditor'+j+'');		    	
+			    	$('#mtomcqansweroption').append('<div class="checkbox"><label><input type="checkbox" name="checkboxlist" value="'+j+'">Option'+j+'</label></div>');
+			    	}
+			    	$("div#mtoMcqAnswerDiv").css("display", "block");
+					$("div#submitMtoMcqBtn").css("display", "block");
+			}
 			function addDescQues()
     		{
     			console.log('wsfghfdefg');
@@ -512,18 +548,24 @@
     		function addMtoMcqQues()
     		{
     			var mtoMcqQuestion = CKEDITOR.instances.mtoMcqQuestionTextbox.getData();
-    			var mtoMcqOpt1 = CKEDITOR.instances.mtoMcqOpt1Textbox.getData();
-    			var mtoMcqOpt2 = CKEDITOR.instances.mtoMcqOpt2Textbox.getData();
-    			var mtoMcqOpt3 = CKEDITOR.instances.mtoMcqOpt3Textbox.getData();
-    			var mtoMcqOpt4 = CKEDITOR.instances.mtoMcqOpt4Textbox.getData();
     			var examId = $('#mto_mcq_exam_id').val();
-    			
+    			var no_of_options = $('#no_of_mto_options_input').val();				
+    			var options  = [];
+    			var optLeftEmpty = false;
+    			for(i=1; i<=no_of_options; i++)
+    			{
+    				if(eval('CKEDITOR.instances.mtoMcqOpt'+i+'Textbox').getData()=='')
+    				{
+    					optLeftEmpty= true;
+    					break;
+    				}
+    				options.push(eval('CKEDITOR.instances.mtoMcqOpt'+i+'Textbox').getData());
+    			}
     			
     			if(!$('input[name=checkboxlist]:checked').is(':checked'))
     			{
     				$('#mtoMcqQuesErrDiv').html('Answer Left Empty');    			
-    			}else if(mtoMcqQuestion==""||mtoMcqOpt1==""||mtoMcqOpt2==""||mtoMcqOpt3==""||mtoMcqOpt4==""){
-    				console.log('empty');
+    			}else if(mtoMcqQuestion==""||optLeftEmpty == true){
     				$('#mtoMcqQuesErrDiv').html('Some Field Left Empty');    			
     			}
     			else
@@ -533,24 +575,17 @@
 		                return $(this).val();
 		            }).get()
     				console.log(mtoMcqQuestion);
-    				console.log(mtoMcqOpt1);
-    				console.log(mtoMcqOpt2);
-    				console.log(mtoMcqOpt3);
-    				console.log(mtoMcqOpt4);
-    				console.log(checkValues);
     				$('#mtoMcqQuesErrDiv').html(''); 
-    				
+    				console.log(checkValues);
     				$.ajax({
 				        url: '<?php echo base_url();?>index.php?admin/addMtoMcqQues',
 				        type: 'POST',
 				        data: {
 				            examId : examId,
 				            mtoMcqQuestion: mtoMcqQuestion,
-				            mtoMcqOpt1:mtoMcqOpt1,
-				            mtoMcqOpt2:mtoMcqOpt2,
-				            mtoMcqOpt3:mtoMcqOpt3,
-				            mtoMcqOpt4:mtoMcqOpt4,
+				            mtoMcqOpt:options,
 				            mtoMcqAnswer:checkValues,
+				            no_of_options: no_of_options
 				            },
 				        async: false,
 				        success: function(datareturn) {
@@ -565,28 +600,31 @@
     		}
     		function addMcqQues()
     		{
-    			console.log('wsfghfdefg');
-    			var mcqQuestion = CKEDITOR.instances.mcqQuestionTextbox.getData();
-    			var mcqOpt1 = CKEDITOR.instances.mcqOpt1Textbox.getData();
-    			var mcqOpt2 = CKEDITOR.instances.mcqOpt2Textbox.getData();
-    			var mcqOpt3 = CKEDITOR.instances.mcqOpt3Textbox.getData();
-    			var mcqOpt4 = CKEDITOR.instances.mcqOpt4Textbox.getData();
+    			var mcqQuestion = CKEDITOR.instances.mcqQuestionTextbox.getData();    			
+    			var no_of_options = $('#no_of_options_input').val();				
+    			var options  = [];
+    			var optLeftEmpty;
+    			for(i=1; i<=no_of_options; i++)
+
+    			{
+    				if(eval('CKEDITOR.instances.mcqOpt'+i+'Textbox').getData()=='')
+    				{
+    					optLeftEmpty= true;
+    					break;
+    				}
+    				options.push(eval('CKEDITOR.instances.mcqOpt'+i+'Textbox').getData());
+    			}
+    			var no_of_options  = $('#no_of_options_input').val();
     			var examId = $('#mcq_exam_id').val();
     			var mcqAnswer = $('#mcqansweroption').val();
     			
     			if($('#mcqansweroption').val()=='Enter Choice')
     			{
     				$('#mcqQuesErrDiv').html('Answer Left Empty');    			
-    			}else if(mcqQuestion==""||mcqOpt1==""||mcqOpt2==""||mcqOpt3==""||mcqOpt4==""){
-    				console.log('empty');
+    			}else if(mcqQuestion==""||optLeftEmpty== true){
     				$('#mcqQuesErrDiv').html('Some Field Left Empty');    			
     			}
     			else{
-    				console.log(mcqQuestion);
-    				console.log(mcqOpt1);
-    				console.log(mcqOpt2);
-    				console.log(mcqOpt3);
-    				console.log(mcqOpt4);
     				$('#mcqQuesErrDiv').html(''); 
     				$.ajax({
 				        url: '<?php echo base_url();?>index.php?admin/addMcqQues',
@@ -594,16 +632,14 @@
 				        data: {
 				            examId : examId,
 				            mcqQuestion: mcqQuestion,
-				            mcqOpt1:mcqOpt1,
-				            mcqOpt2:mcqOpt2,
-				            mcqOpt3:mcqOpt3,
-				            mcqOpt4:mcqOpt4,
+				            mcqOpt:options,
 				            mcqAnswer: mcqAnswer,
+				            no_of_options: no_of_options
 				            },
 				        async: false,
 				        success: function(datareturn) {
-				            console.log('updated');
-				            document.location.href = '<?php echo base_url();?>index.php?admin/examinationEdit/'+examId;
+				            console.log(datareturn);
+				           	document.location.href = '<?php echo base_url();?>index.php?admin/examinationEdit/'+examId;
         				},
         				error: function(XMLHttpRequest, textStatus, errorThrown) {
    						  alert(errorThrown);

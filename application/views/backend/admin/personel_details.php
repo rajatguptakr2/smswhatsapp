@@ -66,6 +66,7 @@
 	                <div class="form-group">
 						<label for="field-2" class="control-label"><?php echo get_phrase('phone');?></label>
 							<input type="text" class="form-control" name="phone" value="<?php echo $row->phone; ?>" >
+							<span style="color: red">* with country code</span>
 						</div>
 					</div>
 					<div class="col-xs-12 col-sm-4 col-lg-4">	

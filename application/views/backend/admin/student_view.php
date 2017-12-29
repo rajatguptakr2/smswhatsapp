@@ -365,14 +365,16 @@ input:checked + .sliders:before {
 		</p>
 		<p class="col-xs-6">
 			<label for="Relation"> Mobile No</label>
-			<input type="number" class="form-control" name="mobile_no" value="<?php echo $par->mobile_no; ?>" required>
+			<input type="text" class="form-control" name="mobile_no" value="<?php echo $par->mobile_no; ?>" required>
+			<span style="color: red">* with country code</span>		
 		</p>
 		<p class="col-xs-6">
 			<label for="Relation"> Phone No</label>
-			<input type="number" class="form-control" name="phone_no"  value="<?php echo $par->phone; ?>"  >
+			<input type="text" class="form-control" name="phone_no"  value="<?php echo $par->phone; ?>"  >
+			<span style="color: red">* with country code</span>
 		</p>
 		<p class="col-xs-6">
-			<label for="Relation"> Qualification</label>
+			<label for="qualification"> Qualification</label>
 			<textarea name="qualification" id="qualification" class="form-control" ><?php echo $par->qualification; ?></textarea>
 		</p>
 		<p class="col-xs-6">
@@ -488,14 +490,16 @@ input:checked + .sliders:before {
 								</div>
 								
 								<div class="col-md-3 col-sm-3 col-xs-6 newClass2" >
-								 <p><?php echo $par->mobile_no; ?></p>							
+								 <p><?php echo $par->mobile_no; ?></p>
+								<!--  <span style="color: red">* with country code</span> -->							
 								</div>
 								
 								<div class="col-md-3 col-sm-3 col-xs-6 newClass" >
 								 <p>Phone No</p>							
 								</div>
 								<div class="col-md-3 col-sm-3 col-xs-6 newClass2" >
-								 <p><?php echo $par->phone; ?></p>							
+								 <p><?php echo $par->phone; ?></p>
+								 <!-- <span style="color: red">* with country code</span>	 -->						
 								</div>
 								</div>
 								

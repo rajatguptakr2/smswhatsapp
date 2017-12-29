@@ -143,7 +143,6 @@
 		return true;
 	}
 	$('button.downloadPaper').click(function(event) {	
-		console.log('fghjkgfdfghjk');
 		download_file_name = (this).value;
 		$.ajax({
 			        url: '<?php echo base_url();?>index.php?admin/download_question_paper',
